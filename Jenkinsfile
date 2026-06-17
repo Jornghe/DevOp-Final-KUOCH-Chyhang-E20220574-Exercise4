@@ -7,8 +7,9 @@ pipeline {
 
     environment {
         CC_EMAIL          = 'srengty@gmail.com'
-        ANSIBLE_INVENTORY = 'D:/Assignment/DevOp/Final_Ex2/ansible/inventory.ini'
-        ANSIBLE_PLAYBOOK  = 'D:/Assignment/DevOp/Final_Ex2/ansible/playbook.yml'
+        DOCKER            = 'C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe'
+        ANSIBLE_INVENTORY = 'D:\\Assignment\\DevOp\\Final_Ex2\\ansible\\inventory.ini'
+        ANSIBLE_PLAYBOOK  = 'D:\\Assignment\\DevOp\\Final_Ex2\\ansible\\playbook.yml'
     }
 
     stages {
@@ -21,30 +22,23 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh '''
-                    docker exec springboot-web bash -c "
-                        cd /app &&
-                        git pull &&
-                        mvn package -DskipTests -Dmaven.compiler.enablePreview=true
-                    "
+                bat '''
+                    "%DOCKER%" exec springboot-web bash -c "cd /app && git pull && mvn package -DskipTests -Dmaven.compiler.enablePreview=true"
                 '''
             }
         }
 
         stage('Test') {
             steps {
-                sh '''
-                    docker exec springboot-web bash -c "
-                        cd /app &&
-                        mvn test -Dspring.profiles.active=test -Dmaven.compiler.enablePreview=true
-                    "
+                bat '''
+                    "%DOCKER%" exec springboot-web bash -c "cd /app && mvn test -Dspring.profiles.active=test -Dmaven.compiler.enablePreview=true"
                 '''
             }
         }
 
         stage('Deploy with Ansible') {
             steps {
-                sh 'wsl ansible-playbook ${ANSIBLE_PLAYBOOK} -i ${ANSIBLE_INVENTORY}'
+                bat 'wsl ansible-playbook %ANSIBLE_PLAYBOOK% -i %ANSIBLE_INVENTORY%'
             }
         }
     }
