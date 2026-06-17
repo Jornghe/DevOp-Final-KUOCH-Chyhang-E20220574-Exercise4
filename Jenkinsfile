@@ -38,7 +38,9 @@ pipeline {
 
         stage('Deploy with Ansible') {
             steps {
-                bat 'wsl ansible-playbook %ANSIBLE_PLAYBOOK% -i %ANSIBLE_INVENTORY%'
+                bat '''
+                    "%DOCKER%" exec springboot-web bash -c "cd /app && git pull && mvn package -DskipTests -Dmaven.compiler.enablePreview=true && mysqldump -h db -u root -pHello@123 --single-transaction B-KUOCH_Chyhang-db > /tmp/backup.sql && echo Deploy done"
+                '''
             }
         }
     }
